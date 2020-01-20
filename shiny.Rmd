@@ -1,0 +1,106 @@
+---
+title: "Shiny for data visualisation"
+output: html_document
+runtime: shiny
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+<!-- Baris kode di atas merupakan pengaturan untuk dokumen R Markdown dan tidak akan tercetak pada berkas dokumen akhir -->
+
+> Dalam modul ini Anda akan belajar bagaimana cara membuat aplikasi web sederhana untuk visualisasi data.
+
+Pada bagian modul ini, kita akan membuat aplikasi web sederhana untuk menampilkan grafik kualitas udara di Kota Bandung selama periode tertentu. Kita akan mencoba membuat dan memodifikasi aplikasi web dengan menggunakan dokumen R Markdown sebagai *sandbox*. Kita akan memerlukan empat *chunk* untuk menuliskankan kode. Masing-masing *chunk* tersebut akan kita beri nama sebagai "global", "ui", "server", dan "run-app". Perhatikanlah contoh cara untuk mengatur hal tersebut pada *chunk* pertama!
+
+**`global`**
+
+Pada *chunk* pertama, kita akan mengaktifkan paket-paket yang diperlukan sehingga aplikasi web dapat berjalan dengan baik. Paket yang kita perlukan adalah `shiny`, `here`, `vroom`, `dplyr`, dan `ggplot2`, dan `plotly`. Selain itu, kita juga diminta untuk mengimpor berkas "udara_bandung.csv" yang berada dalam subdirektori "data-raw" sebagai obyek R bernama `udara_bandung`. `udara_bandung` akan menjadi obyek global yang nanti akan dipergunakan oleh aplikasi web.
+Selanjutnya kita akan membuat dua obyek global lain yaitu `option_station` dan `option_parameter`.
+
+```{r global}
+library(__________)
+library(__________)
+library(__________)
+library(__________)
+library(__________)
+library(__________)
+
+___ <- vroom(_____("_____", "___"))
+_____ <- unique(udara_bandung[["station"]])
+___ <- colnames(udara_bandung)[-c(1, 2)]
+```
+
+**`ui`**
+
+Berikutnya kita akan menuliskan kode antarmuka (*front-end*/*user interface*) pada *chunk* UI Terdapat berbagai jenis tata letak laman antarmuka yang disediakan oleh paket `shiny` maupun oleh paket tambahan lainnya. Dalam kasus ini kita akan menggunakan `fluidPage()` dan `sidebarLayout()` untuk mengatur tata letak laman aplikasi web. Berilah judul yang sesuai pada `headerPanel()`. Selanjutnya tambahkanlah satu `selectInput()` dengan argumen `inputId = "parameter"`, `label = "Parameter"`, dan `choices = option_parameter`. Buat satu `textInput()` tambahan yang berfungsi untuk mengatur judul pada grafik, Serta tambahkan `plotlyOutput()` pada `mainPanel()` dengan `outputId = "aq_plot"` sebagai argumen. 
+
+```{r ui}
+ui <- fluidPage(
+  title = "_________________________",
+  headerPanel("Air Quality of Kota Bandung"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(inputId = "station",
+                  label =  "Station",
+                  choices = option_station,
+                  multiple = TRUE,
+                  selected = option_station[[1]]),
+      ____________________________________",
+                ____________________________",
+                __________),
+      textInput(inputId = "parameter_label",
+                label = "Label for parameter",
+                value = ""),
+      ____________________________________",
+                ____________________________",
+                __________),
+    ),
+    mainPanel(
+      plotlyOutput(outputId = "aq_plot")
+    )
+  )
+)
+```
+
+**`server`**
+
+Selanjutnya kita perlu menuliskan kode logika aplikasi yang dieksekusi oleh aplikasi web untuk melakukan pemrosesan data. *Chunk* ketiga ini merupakan tempat Anda untuk mengembangkan *back-end* aplikasi web. Disini kita harus membuat obyek R berupa fungsi dengan tiga argumen, yaitu: `input`, `output`, dan `session`. Kemudian di dalam badan fungsi tersebut kita akan menempatkan seluruh kode pemrosesan data. Kita akan menggunakan `input` yang telah dituliskan pada bagian `ui` sebagai "bahan baku" dan kemudian menampilkan hasilnya pada `output`. Konten `input` dapat kita akses di `input$inputId`, sedangkan komponen `output` dapat kita simpan ke `output$outputId`. Pastikan semua Id tersebut sama dengan apa yang terdapat di `ui`! Lengkapilah *chunk* berikut:
+
+```{r server}
+server <- function(input, output, session) {
+  aq_plot <- reactive({
+    udara_bandung %>%
+      filter(station %in% input$station) %>%
+      ggplot(aes_string(x = "day", y = ___, colour = "station")) +
+      geom____ +
+      scale_x_date(date_breaks = "2 weeks") +
+      labs(
+        x = "",
+        y = ifelse(input$parameter_label == "", input$parameter, input$parameter_label),
+        colour = "Station",
+        title = input$___
+      ) +
+      theme_light()
+  })
+  
+  output$___ <- renderPlotly({
+    ggplotly(aq_plot())
+  })
+}
+```
+
+**`run-app`**
+
+Akhirnya Anda selesai menuliskan komponen `global`, `ui`, dan `server`. Sekarang saatnya Anda mencoba aplikasi web yang telah Anda kembangkan! Jalankanlah baris kode pada *chunk* berikut:
+
+```{r run-app}
+shinyApp(ui = ui, server = server, options = list(height = "500px"))
+```
+
+> Selamat Anda telah menyelesaikan modul shiny! Silakan jalankan "Ctrl + Shift + K" atau klik tombol "Knit" untuk membuat dokumen final.

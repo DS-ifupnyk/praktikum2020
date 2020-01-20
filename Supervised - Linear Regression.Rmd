@@ -1,0 +1,156 @@
+---
+title: "Supervised learning"
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+<!-- Baris kode di atas merupakan pengaturan untuk dokumen R Markdown dan tidak akan tercetak pada berkas dokumen akhir -->
+
+> Dalam modul ini Anda akan diajak untuk membuat pemodelan dan melakukan prediksi menggunakan model tersebut.
+
+*Data modelling* dengan menggunakan pembelajaran mesin (*machine learning*) merupakan aktivitas yang seringkali dilakukan dalam siklus data science. Sangat menarik apabila memiliki kemampuan untuk membuat prediksi suatu hal sehingga kita dapat melakukan persiapan lebih matang.
+
+Bahasa pemrograman R memiliki fitur bawaan yang sangat mumpuni untuk melakukan pembelajaran mesin. Selain itu terdapat sangat banyak paket-paket tambahan lain yang dapat melengkapi dan memudahkan pengguna untuk melakukan prediksi dengan menggunakan metode-metode mutakhir.
+
+Namun keragaman dan banyaknya jumlah paket tersebut juga menyebabkan adanya hambatan lain, yaitu hambatan pada alur kerja. Seringkali beberapa paket memiliki tujuan dan metode yang sama namun menggunakan istilah berbeda dalam argumen serta keluaran fungsinya. Selain itu juga tidak jarang antar paket memiliki *API* yang berbeda-beda sehingga pengguna harus menyesuaikan bentuk data sebelum dapat digunakan oleh paket lainnya.
+
+Dalam modul ini kita akan memanfaatkan sebuah "sistem" bernama `tidymodels`. `tidymodels` dirancang untuk mengatasi permasalahan yang disebutkan diatas sehingga pengguna dapat melakukan pembelajaran mesin dengan lebih mudah. Silakan Anda aktifkan paket tersebut terlebih dahulu beserta paket `vroom` dan `here`!
+
+```{r}
+___
+___
+___
+```
+
+Pada modul ini, kita akan langsung belajar menerapkan data modelling melalui studi kasus. Dalam studi kasus pertama, kita akan melakukan pemodelan dan prediksi untuk nilai ujian nasional tingkat SMP di Kota Bandung. Imporlah "un_smp.csv" yang berada dalam subdirektori "data-raw" dan simpan sebagai obyek R bernama `un_smp`. Selanjutnya jalankan fungsi `glimpse()` pada `un_smp` untuk mempelajari strurukturnya. (Catatan: `glimpse()` adalah fungsi dari paket `dplyr` yang serupa dengan fungsi `str()`)
+
+```{r}
+___ <- vroom(here("data-raw", "___"))
+glimpse(un_smp)
+```
+
+Kita akan mencoba melakukan prediksi nilai ujian mata pelajaran IPA (`ipa`) berdasarkan variabel-variabel lain, yaitu `tahun`, `status`, `jumlah_peserta`, `bahasa_indonesia`, `bahasa_inggris`, dan `matematika`. Sebelum itu kita perlu mengubah tipe variabel `tahun` dari `dbl` menjadi `chr` sebagai berikut, cek hasil perubahannya dengan fungsi `glimpse()`:
+
+```{r}
+_______ <- un_smp %>% 
+  mutate(tahun = as.character(tahun))
+_______(un_smp)
+```
+
+Mari kita coba membuat perbandingan nilai ujian IPA antara sekolah negeri dan swasta. Perhatikan kode yang disajikan pada *chunk* berikut:
+
+```{r}
+un_smp %>% 
+  group_by(status) %>% 
+  summarise(ipa = mean(ipa)) %>% 
+  ggplot(aes(x = status, y = ipa)) +
+  geom_col() + 
+  labs(
+    x = "Status sekolah",
+    y = "Rerata nilai ujian IPA",
+    title = "SMP Negeri vs SMP Swasta",
+    subtitle = "Ujian Nasional SMP di Kota Bandung 2015-2019",
+    caption = "Sumber: Open Data Kota Bandung"
+  ) +
+  theme_light()
+```
+
+Melalui grafik yang dihasilkan pada script diatas, sebagai analisa awal, dapat disimpulkan bahwa terdapat kemungkinan adanya pengaruh dari status sekolah terhadap nilai ujian IPA. Sekarang buatlah grafik yang serupa untuk mempelajari kemungkinan pengaruh dari tahun ujiandan menganalisa kesimpulan apa yang dapat kita peroleh melalui grafik yang kita buat.
+
+```{r}
+un_smp %>%
+group_by(tahun) %>%
+summarise(ipa = mean(ipa)) %>%
+ggplot(aes(x = tahun, y = ipa)) +
+geom_col() +
+labs(
+x = "Tahun pelaksanaan",
+y = "Rerata nilai ujian IPA",
+title = "SMP Negeri vs SMP Swasta",
+subtitle = "Ujian Nasional SMP di Kota Bandung 2015-2019",
+caption = "Sumber: Open Data Kota Bandung"
+) +
+theme_light()
+```
+
+Sebagai analisa lanjut, kita akan melakukan tahap pertama dari pembelajaran mesin, yaitu membagi data yang kita miliki ke dalam dua kelompok. Kelompok pertama disebut `data training` yang akan digunakan untuk membuat pemodelan. Sedangkan kelompok kedua disebut `data testing` yang akan digunakan untuk menguji performa model yang kita buat. Kita akan
+memanfaatkan fungsi `initial_split()` dari paket `rsample` untuk melakukan hal tersebut. Berapakah komposisi `training` terhadap `testing` bawaan pada fungsi tersebut? (Petunjuk: `?initial_split`)
+
+```{r}
+set.seed(270719)
+un_smp_split <- initial_split(un_smp)
+un_smp_split
+```
+
+`un_smp_split` merupakan obyek R yang memiliki metadata atau informasi baris mana dari data `un_smp` yang akan digunakan sebagai `data training` dan `data testing`. Kita dapat mengakses data `training` dengan cara menjalankan fungsi `training()` pada `un_smp_split`. Fungsi apakah yang akan digunakan untuk mengakses data `testing`? Coba buatlah baris kode untuk itu!
+
+**data `training`**
+```{r}
+training(un_smp_split) 
+```
+
+**data `testing`**
+```{r}
+___
+```
+
+Sebelum membuat pemodelan, biasanya kita akan melakukan pre-processing pada data yang kita miliki terlebih dahulu. Hal tersebut penting dilakukan agar data tersebut dapat memenuhi prasyarat sehingga algoritma dari model dapat berjalan dengan baik dengan performa bagus. Contoh: pada metode regresi linear diharapkan tidak terjadi *multicolinearity* antar variabel prediktor; pada beberapa metode klasifikasi diharapkan agar skala yang digunakan adalah sama untuk semua prediktor; dan lain-lain.
+
+Dalam `tidymodels` tahap pre-processing tersebut dianalogikan sebagai "resep" sehingga dapat mudah dipahami. Kita dapat menggunakan fungsi `recipe()`, `update_role()`, dan `step_*()` dari paket `recipes` untuk membuat "resep" tersebut. Perhatikan baris kode berikut untuk membuat "resep" berdasarkan data `training`:
+
+```{r}
+un_smp_recipe <- training(un_smp_split) %>% 
+  recipe() %>% 
+  update_role(ipa, new_role = "outcome") %>% 
+  update_role(tahun, status, jumlah_peserta, bahasa_indonesia, bahasa_inggris, matematika, new_role = "predictor") %>% 
+  update_role(nama_sekolah, new_role = "ID") %>% 
+  step_corr(all_predictors(), -tahun, -status)
+
+un_smp_recipe
+summary(un_smp_recipe)
+```
+
+Berdasarkan keluaran fungsi di atas informasi apakah yang dapat kita peroleh?
+
+Tahap selanjutnya adalah kita harus menerapkan "resep" yang telah di buat pada data yang kita miliki, baik pada data `training` maupun `testing`. Hal tersebut dapat dilakukan dengan menggunakan fungsi `prep()` dan `bake()` yang juga berasal dari paket `parsnip`. Setelah "resep" diterapkan kita perlu menyimpan hasilnya sebagai obyek R untuk selanjutnya malakukan pemodelan dan evaluasi performa. Perhatikan baris kode berikut untuk menerapkan "resep" serta menyimpannya obyek R dengan nama `un_smp_training` dan `un_smp_testing`. Jalankan `glimpse()` pada dua obyek tersebut! Dapatkah Anda menemukan perbedaan kedua obyek tersebut dengan `training(un_smp_split)` dan `testing(un_smp_split)`?
+
+```{r}
+un_smp_training <- un_smp_recipe %>% 
+  prep() %>% 
+  bake(training(un_smp_split))
+___(un_smp_training)
+
+un_smp_testing <- un_smp_recipe %>% 
+  prep() %>% 
+  bake(testing(un_smp_split))
+___(un_smp_testing)
+```
+
+Setelah Anda membagi data awal menjadi dua `training` dan `testing` serta menerapkan "resep" pra-pengolahan pada keduanya, sekarang saatnya Anda melakukan pemodelan. Dalam studi kasus ini kita akan menggunakan model Linear Regression
+
+Pertama kita akan membuat model regresi sebagai berikut:
+
+```{r}
+un_smp_lm <- linear_reg(mode = "regression") %>% 
+  set_engine("lm") %>% 
+  fit(ipa ~ . -nama_sekolah, data = un_smp_training)
+
+un_smp_lm
+```
+
+Selanjutnya kita akan menguji performa model tersebut dengan menggunakan fungsi `metrics()` dari paket `yardstick`. Pengujian dilakukan terhadap data `testing` seperti contoh di bawah ini:
+```{r}
+un_smp_lm %>% 
+  predict(un_smp_testing) %>% 
+  bind_cols(un_smp_testing) %>% 
+  metrics(truth = ipa, estimate = .pred)
+```
+
+Kesimpulan apa yang dapat Anda ambil berdasarkan hasil diatas?
+
+> Selamat Anda telah menyelesaikan modul Linear Regression! Silakan jalankan "Ctrl + Shift + K" atau klik tombol "Knit" untuk membuat dokumen final.

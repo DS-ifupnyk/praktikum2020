@@ -1,0 +1,149 @@
+---
+title: "Data import and troubleshoots"
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+<!-- Baris kode di atas merupakan pengaturan untuk dokumen R Markdown dan tidak akan tercetak pada berkas dokumen akhir -->
+
+> Aktivitas analisis data seringkali dilakukan dengan menggunakan data yang dihasilkan oleh program lain. Dalam modul ini Anda akan belajar bagaimana cara melakukan impor data kedalam R untuk selanjutnya melakukan manipulasi, visualisasi, atau pemodelan.
+
+## Alamat berkas
+
+Tahap terpenting sebelum kita melakukan impor data adalah menentukan alamat dimana berkas atau dokumen yang akan diimpor disimpan. Praktek terbaik pertama adalah menyimpan berkas data, skrip analisis, dan keluaran analisis di dalam satu direktori utama serta membaginya ke dalam beberapa subdirektori. Sebagai contoh, dalam pelatihan ini semua material disimpan dalam satu direktori "praktikum2020". Praktek terbaik kedua adalah menuliskan alamat berkas atau dokumen relatif terhadap direktori utama. Hindari menulis alamat berkas relatif terhadap alamat *hardisk*, contohnya "C:/Documents/.." atau "/home/aswansyahputra/Documents".
+
+Dalam modul ini Anda akan menggunakan paket `here` untuk menentukan dan menuliskan alamat berkas atau dokumen. Aktifkanlah paket `here` terlebih dahulu dengan menjalankan `library(nama_paket)`!
+
+```{r}
+library(___)
+```
+
+Kemudian periksalah alamat direktori utama berada dengan cara menjalankan fungsi `dr_here()`. Mengapa direktori utama terdeteksi dan berada pada alamat tersebut?
+
+```{r}
+dr_here()
+```
+
+Kita juga dapat menggunakan fungsi `here()` untuk mendapatkan alamat direktori utama. Selanjutnya bagaimana cara untuk menuliskan alamat suatu berkas atau dokumen dengan cara menggunakan fungsi `here()`? Dalam contoh berikut kita dapat menentukan alamat dari berkas 'udara_bandung.xlsx' yang tersimpan dalam subdirektori "data-raw".
+
+```{r}
+___ # dimanakah alamat direktori utama/Project berada?
+here("data-raw", "udara_bandung.xlsx")
+```
+
+Keuntungan menggunakan fungsi `here()` adalah Anda tidak perlu menuliskan alamat berkas atau dokumen secara manual. Selain itu fungsi `here()` juga akan menangani masalah perbedaan cara penulisan alamat yang umumnya berbeda antar sistem operasi komputer.
+
+## Impor berkas Microsoft Excel
+
+Spreadsheet merupakan format dokumen yang sangat umum kita temukan dan pergunakan. Oleh karena itu, dalam modul ini pertama kita akan belajar bagaimana cara mengimpor berkas spreadsheet dari Microsoft Excel yang notabene sering kita pergunakan.
+
+Secara baku, R tidak dapat mengenali dan mengimpor berkas Excel (`xls`/`xlsx`). Namun kita dapat menggunakan paket `readxl` untuk melakukan hal tersebut. Adapun fungsi yang dapat dipergunakan adalah `read_xls()` atau `read_xlsx()` tergantung ekstensi berkas Excel tersebut. Namun, kita juga dapat menggunakan satu fungsi `read_excel()` yang secara otomatis dapat menebak ekstensi berkas Excel yang Anda miliki.
+
+Pertama-tama kita akan mengaktifkan paket `readxl` dan mengimpor berkas "udara_bandung.xlsx" sebagai obyek R bernama `udara_bandung`. Berkas tersebut berisi informasi mengenai kualitas udara di kota Bandung pada periode tertentu. Jangan lupa untuk menuliskan alamat berkas dengan menggunakan fungsi `here()` seperti contoh di atas.
+
+```{r}
+library(readxl)
+udara_bandung <- read_excel(path = here("data-raw", "___"))
+```
+
+Sekarang Anda dapat melakukan inspeksi terhadap obyek `udara_bandung` tersebut. Ada berapa baris dan kolom yang ada pada obyek tersebut? (Petunjuk: fungsi `nrow()` dan `ncol()`)
+
+```{r}
+udara_bandung
+___(udara_bandung)
+ncol(___)
+```
+
+Selanjutnya, cobalah buka berkas "udara_bandung.xlsx" menggunakan aplikasi Microsoft Excel atau sejenisnya. Ada berapa lembar kerja (*sheet*) yang terdapat dalam berkas tersebut? Bagaimana cara Anda mengimpor lembar kerja ke-2 dari berkas Excel tersebut dan menyimpannya sebagai obyek R bernama `udara_badung_gedebage`? (Petunjuk: `help(read_excel)`)
+
+```{r}
+___ <- read_excel(here("data-raw", "udara_bandung.xlsx"), sheet = ___)
+udara_bandung_gedebage
+```
+
+## Impor berkas *delimited*
+
+Selain berkas spreadsheet dari Microsoft Excel, salahsatu format berkas yang sering digunakan adalah *delimited files*. Berkas *delimited* merupakan format "universal" dalam artian dapat dapat dikenali, dibaca, dan dipergunakan oleh banyak program tanpa harus menggunakan fitur tambahan. Ekstensi berkas *delimited* yang sering kita jumpai umumnya adalah `txt` dan `csv`.
+
+Di R terdapat berbagai fungsi dan paket yang dapat digunakan untuk membaca dan menulis)berkas *delimited*. Contohnya dari paket `utils` (paket bawaan dari R) terdapat fungsi `read.table()`, `read.csv()`, `read.csv2()`, `read.delim()`, dan `read.delim2()`. Selain itu ada fungsi `read_table()`, `read_table2()`, `read_csv()`, `read_csv2()`, `read_delim()`, dan `read_delim2()` dari paket `readr`. Terdapat juga fungsi dari paket lainnya dengan tujuan serupa misalnya `fread()` dari `data.table` dan `vroom()` dari `vroom()`.
+
+Mengapa ada banyak fungsi dan paket berbeda untuk tujuan yang sama? Hal utama yang menjadi dasar perbedaan adalah konsistensi, kemudahan penggunaan fungsi bagi pengguna, dan kecepatan dalam membaca berkas. Berdasarkan pertimbangan dari aspek-aspek tersebut, dalam modul ini kita akan fokus menggunakan paket `vroom` untuk mengimpor berkas *delimited*.
+
+Aktifkanlah paket `vroom` dan bacalah dokumentasi fungsi `vroom()`!
+
+```{r}
+___
+help(vroom)
+```
+
+Sekarang cobalah impor berkas "anggaran-dinkes-2013.csv" yang berada dalam subdirektori "data-raw" dengan menggunakan fungsi `vroom()` dan simpanlah sebagai obyek R dengan nama `dinkes_2013_vroom`! Kemudian lakukanlah inspeksi terhadap `dinkes_2013_vroom` tersebut. Ada berapa observasi dan variabel? Apa saja nama dan tipe dari setiap variabel data tersebut? (Petunjuk: fungsi `str()` serta `summary()`)
+
+```{r}
+dinkes_2013_vroom <- vroom(here("data-raw", "___"))
+dinkes_2013_vroom
+___(dinkes_2013_vroom)
+summary(___)
+```
+
+Sebagai perbandingan, sekarang imporlah berkas yang sama namun menggunakan fungsi `read.csv()` dari paket `utils` dan simpanlah hasilnya sebagai obyek R bernama `dinkes_2013_utils`! Lakukanlah inspeksi serupa dengan `dinkes_2013_vroom`. Apakah ada perbedaan yang Anda temukan?
+
+```{r}
+___ <- read.csv(here("data-raw", "anggaran-dinkes-2013.csv"))
+dinkes_2013_utils
+str(dinkes_2013_utils)
+___
+```
+
+Anda dapat menggunakan fungsi `class()` untuk mengetahui jenis dari suatu obyek R. Apa hasil yang muncul saat Anda menjalankan fungsi tersebut pada `dinkes_2013_vroom` dan `dinkes_2013_utils`? Jika terdapat perbedaan, dapatkah Anda menjelaskannya? (Petunjuk: `?class`)
+
+```{r}
+___(dinkes_2013_vroom)
+class(___)
+```
+
+Terakhir lakukanlah perbandingan antara jenis data pada kolom "program" dari masing-masing dataset tersebut! Anda dapat mengekstrak kolom dari suatu *dataframe* menggunakan operator `$` dengan format `nama_tabel$nama_kolom`. Gunakanlah fungsi `class()` seperti di atas! 
+```{r}
+class(dinkes_2013_vroom$___)
+class(___$program)
+```
+
+## Impor banyak berkas *delimited*
+
+Bukalah subdirektori "data-raw" baik melalui *Files pane* (Ctrl + 5) atau melalui *Files explorer* komputer Anda. Di dalam subdirektori tersebut terdapat beberapa berkas yang berisi informasi mengenai anggaran Dinas Kesehatan Kota Bandung pada tahun 2013 hingga 2018. Bagaimana cara untuk mengimpor semua berkas tersebut secara sekaligus?
+
+Selanjutnya kita akan mencoba dengan dua cara yang berbeda untuk mengimpor beberapa
+berkas sekaligus. Cara pertama adalah dengan menggunakan *functional iteration* bawaan R, dan cara kedua adalah dengan menggunakan fungsi `vroom()`.
+
+Semua cara yang akan dilakukan memiliki satu tahap pertama yang sama, yaitu membuat daftar alamat berkas-berkas yang akan diimpor. Kita dapat membuat daftar alamat tersebut dengan cara menggunakan fungsi `list.files()`. Sesuaikanlah *pattern* agar alamat yang terseleksi hanyalah alamat berkas yang relevan! Simpan daftar alamat tersebut dalam obyek R bernama `berkas_anggaran_dinkes`.
+
+```{r}
+___ <- list.files(path = here("data-raw"), pattern = "___", full.names = TRUE)
+berkas_anggaran_dinkes
+```
+
+Berikut merupakan cara pertama untuk mengimpor berkas-berkas tersebut dengan
+menggunakan *functional iteration*:
+```{r}
+anggaran_dinkes_lapply <- lapply(berkas_anggaran_dinkes, read.csv)
+anggaran_dinkes_lapply <- Reduce(rbind, anggaran_dinkes_lapply)
+anggaran_dinkes_lapply
+```
+
+Pada cara kedua, kita akan mengimpor beberapa berkas *delimited* sekaligus menggunakan `vroom()`:
+```{r}
+anggaran_dinkes_vroom <- vroom(berkas_anggaran_dinkes)
+anggaran_dinkes_vroom
+```
+
+Menurut Anda manakah cara yang paling mudah dan cepat? Pergunakan fungsi `identical()` untuk menguji apakah obyek  `anggaran_dinkes_lapply`, dan `anggaran_dinkes_vroom` persis sama atau atau tidak. Apa kesimpulan yang dapat Anda tarik? (Petunjuk: jalankan `identical()` untuk setiap kombinasi obyek)
+
+```{r}
+identical(___, anggaran_dinkes_vroom)
+```
+
+> Selamat Anda telah menyelesaikan modul 7! Silakan jalankan "Ctrl + Shift + K" atau klik tombol "Knit" untuk membuat dokumen final.
