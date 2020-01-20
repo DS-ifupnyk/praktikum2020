@@ -1,0 +1,172 @@
+---
+title: "Grammar of graphic for data visualisation"
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+<!-- Baris kode di atas merupakan pengaturan untuk dokumen R Markdown dan tidak akan tercetak pada berkas dokumen akhir -->
+
+> Dalam modul ini Anda akan menggunakan konsep Grammar of Graphics untuk membuat visualisasi data.
+
+R merupakan bahasa pemrograman yang terkenal akan kemampuannya dalam menghasilkan grafik atau visualisasi data dengan baik. Penting diketahui bahwa R memiliki berbagai sistem dan paket untuk pembuatan grafik, contohnya `base`, `lattice`, `ggplot`, dan lain-lain. Namun dalam modul ini Akita akan fokus menggunakan sistem `ggplot` untuk membuat visualisasi data.
+
+Sistem pembuatan grafik dengan `ggplot` dapat dilakukan dengan menggunakan paket `ggplot2` yang merupakan implementasi dari konsep *Grammar of graphic* untuk bahasa pemrograman R. Dengan memahami konsep dari *grammar of graphic*, kita dapat membuat berbagai jenis plot dengan ringkas dan mudah. Sekarang aktifkanlah paket `ggplot2` tersebut terlebih dahulu!
+
+```{r load-package}
+library(_____)
+```
+
+Dalam contoh ini Anda akan membuat grafik dari dataset `diamonds` yang tersedia dalam paket `ggplot2`. Anda dapat melihat isi serta dokumentasi dari dataset tersebut dengan menjalankan `diamonds` dan `?diamonds`. Berisi informasi apakah data `diamonds`? Silakan lakukan inspeksi pada struktur data tersebut!
+
+```{r}
+diamonds
+?___
+str(diamonds)
+```
+
+Kita dapat menggunakan fungsi `qplot()` untuk membuat grafik menggunakan `ggplot2`. Bacalah terlebih dahulu dokumentasi fungsi `qplot()` dan kemudian lengkapilah *chunk* berikut untuk membuat grafik hubungan antara berat (sumbu x), harga (sumbu y) dan kejernihan intan (variasi warna) dari dataset diamonds!
+
+```{r}
+qplot(x = ___, y = price, colour = ___, data = ___)
+```
+
+Pembuatan grafik dengan menggunakan fungsi `qplot()` memang relatif mudah, namun fiturnya terbatas dan kurang fleksibel. Oleh karena itu, kita akan mempelajari dan menggunakan fungsi `ggplot()` untuk membuat visualisasi data dengan lebih leluasa. Grafik diatas dapat diolah kembali dengan menggunakan penulisan kode sebagai berikut::
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = carat, y = price, colour = clarity)) +
+  geom_point()
+```
+
+Hal yang menarik dan membedakan antara pembuatan grafik menggunakan `ggplot2` dan `base` adalah bahwa keluaran fungsi `ggplot()` dapat disimpan sebagai obyek R. Apa manfaatnya? Pertama adalah kita dapat dengan mudah menyimpan grafik seperti halnya menjalankan `write.csv()` pada dataset. Kedua adalah kita dapat dengan leluasa melakukan modifikasi pada grafik yang telah dibuat. Hal ini akan dibahas dalam subbagian kedepan.
+
+Baris kode dalam *chunk* berikut menunjukan cara untuk menyimpan grafik ke dalam obyek R bernama `plot_diamonds` dan kemudian menyimpannya dalam komputer dengan nama berkas "diamonds.png". Kita akan menggunakan fungsi `ggsave()` yang juga berasal dari paket `ggplot2`.
+
+```{r}
+plot_diamonds <- ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price, colour = clarity)) # Saat output disimpan ke dalam obyek R, grafik tidak otomatis dicetak pada layar
+
+plot_diamonds # Untuk mencetak grafik, Anda harus menjalankan nama obyek R yang sebelumnya dibuat
+
+ggsave(filename = "diamonds.png", plot = plot_diamonds)
+```
+
+Meskipun penulisan kode R untuk membuat grafik menggunakan fungsi `ggplot()` relatif lebih panjang, lebih banyak kostumisasi dan pengaturan grafik yang dapat dilakukan dengan menggunakan fungsi `ggplot()` dibandingkan fungsi `qplot()`. Dalam pelatihan ini Anda akan diminta untuk membuat banyak grafik dengan menggunakan struktur penulisan kode sebagai berikut:
+
+```
+ggplot(data = <DATA>) +
+  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+```
+
+Dapat ditarik kesimpulan berdasarkan struktur penulisan kode R di atas bahwa setidaknya terdapat tiga komponen utama untuk membuat grafik, yaitu:
+
+1. *Data*
+2. *Aesthetic mapping*
+3. *Geometric object*
+
+Pelajarilah dokumentasi fungsi `aes()` dan `geom_point()` (sebagai salah satu contoh *geometric object*) melalui kode berikut!
+```{r}
+?aes
+?geom_point
+```
+
+Selanjutnya kita akan bereksperimen membuat visualisasi data Ujian Nasional tingkat SMP di Kota Bandung yang disediakan oleh [Open Data Kota Bandung](http://data.bandung.go.id). Data tersebut tersedia sebagai berkas "un_smp.csv" dalam subdirektori "data-raw". Silakan impor data tersebut sebagai obyek R bernama `un_smp` menggunakan fungsi `vroom()` dan `here()` dan cetaklah pada layar! (Petunjuk: aktifkan terlebih dahulu paket-paket yang relevan)
+
+```{r}
+library(_____)
+library(_____)
+```
+
+```{r}
+un_smp <- vroom(here("_______", "_______"))
+un_smp
+```
+
+Pelajarilah struktur data `un_smp` tersebut. Ada berapa observasi dan variabel yang tersedia? Apa saja nama dari setiap kolom? Data tahun berapa sajakah yang tersedia pada data tersebut?
+
+```{r}
+___(un_smp)
+___(un_smp)
+```
+
+Dalam modul ini kita akan membuat visualisasi hubungan antara nilai UN mata pelajaran matematika dan bahasa Indonesia. Namun sebelum itu, penting untuk diingat bahwa dalam sistem `ggplot2` suatu grafik dibangun atas tiga komponen utama yaitu *data*, *aesthetic mapping*, dan *geometric objects*. Komponen pertama (*data*) dapat diatur dengan menggunakan baris kode berikut:
+
+```{r}
+ggplot(un_smp)
+```
+
+Selanjutnya kita perlu mendefinisikan dimensi mana dari data yang ingin digambarkan dalam grafik. Pendefinisian ini dilakukan dalam komponen *aesthetic mapping* (`aes()`). Kita diminta untuk mempelajari hubungan antara nilai UN matematika versus bahasa Indonesia. Untuk itu, kita dapat mendefinisikan variabel `bahasa_indonesia` pada sumbu x dan `matematika` pada sumbu y.
+
+```{r}
+ggplot(un_smp, aes(x = ___, y = ___))
+```
+
+Pendefinisian sumbu x dan y telah menghasilkan *layer* baru dalam grafik. Namun, kita masih perlu mendefinisikan bentuk dari grafik tersebut melalui komponen *geometric objects* (`geom_*()`) sebelum grafik tersebut dapat dibaca. Tambahkan obyek geometri berupa titik di atas *layers* yang telah dibuat sebelumnya!
+
+```{r}
+ggplot(un_smp, aes(x = _________, y = __________)) +
+_________()
+```
+
+Selamat sekarang grafik tersebut mulai dapat terbaca! Sekarang kita ingin mengetahui bagaimanakah representasi dari status sekolah (Negeri vs Swasta) pada grafik. Kita dapat menambahkan fungsi `aes()` pada obyek geometri untuk melaukan hal tersebut. Dalam contoh ini kita akan menggunakan *aesthetic* berupa warna titik untuk membedakan antar status sekolah.
+
+```{r}
+_________(un_smp, aes(x = _________, y = ________)) +
+__________(aes(colour = __________))
+```
+
+Mudah sekali bukan? Bagaimana jika Anda ingin menambahkan informasi jumlah peserta ujian yang direpresentasikan oleh ukuran titik dalam grafik tersebut?
+
+```{r}
+________(un_smp, aes(x = ________, y = matematika)) +
+__________(aes(colour = _________, size = _________))
+```
+
+Nampaknya jumlah peserta ujian juga memiliki hubungan dengan nilai ujian, benarkah? Namun sayang sekali grafik tersebut sekarang telihat sangat "penuh" sehingga sulit membedakan antar titik. Apakah transparasi titik-titik tersebut dapat dimodifikasi? Ya! Anda dapat menambahkan argumen "alpha" (nilai 0 hingga 1) pada obyek geometri yang diinginkan. (Pertanyaan: Apa yang terjadi jika Anda menambahkan argumen "alpha" dalam fungsi `aes()` pada obyek geometri?)
+
+```{r}
+_________ (un_smp, aes(x = ________, y = ________)) +
+________(aes(colour = _______, size = _______), alpha = 0.2)
+```
+
+Selanjutnya, kita ingin menganalisa lebih lanjut bagaimanakah hubungan antar nilai ujian nasional
+tersebut jika dibagi per kelompok tahun. Karena Anda sudah menggunakan empat dimensi untuk mempresentasikan data (sumbu x, sumbu y, warna titik, ukuran titik), sekarang mungkin saatnya Anda menggunakan pendekatan berbeda yaitu menggunakan *facet*! Tambahkanlah baris kode `facet_wrap(~tahun, scales = "free")` pada *chunk* berikut!
+
+```{r}
+__________ (un_smp, aes(x = __________, y = __________)) +
+__________ (aes(colour = __________, size = __________), alpha = 0.2) +
+facet_wrap(~_______, ________ = "free")
+```
+
+Hasil visualisasi telah dapat memberikan analisa baru yang dapat kita buat, Namun sayangnya Anda masih belum puas dengan grafik tersebut dalam hal estetika. Lengkapilah *chunk* berikut untuk melakukan modifikasi estetika pada grafik tersebut! kemudian simpanlah grafik tersebut dalam obyek R dengan nama `mtk_vs_ind` dan jangan lupa cetak hasilnya pada layar.
+
+```{r}
+__________<- ggplot(un_smp, aes(x = __________, y = __________)) +
+__________(aes(colour = __________, size = __________), alpha = 0.2) +
+__________(~tahun, scales = "free") +
+labs(
+x = "Bahasa Indonesia",
+y = "Matematika",
+colour = "Status sekolah",
+size = "# peserta",
+title = "____________________________________",
+subtitle = "Ujian Nasional SMP di Kota Bandung 2015-2019",
+caption = "Sumber: Open Data Kota Bandung"
+) +
+theme_light()
+mtk_vs_ind
+```
+
+Sekarang saatnya menyimpan grafik tersebut.
+
+```{r}
+ggsave("_____________.png", plot = ___)
+```
+
+Selamat Anda telah berhasil membuat visualisasi untuk data `un_smp`. Silakan Anda bereksperimen membuat grafik dengan variabel-variabel lain atau bahkan menggunakan obyek geometri lainnya untuk menghasilkan visulisasi data yang berbeda.
+
+> Selamat Anda telah menyelesaikan modul ini! Silakan jalankan "Ctrl + Shift + K" atau klik tombol "Knit" untuk membuat dokumen final.
