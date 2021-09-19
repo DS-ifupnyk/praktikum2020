@@ -1,0 +1,147 @@
+---
+title: "Latihan2_123190138"
+author: "Rega Agassi"
+date: "9/19/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## A. Tujuan Praktikum
+
+ Memahami jenis-jenis tipe data pada R
+
+
+## B. Alokasi Waktu
+
+1 x pertemuan = 120 menit
+
+## C. Tujuan Praktikum
+Variasi tipe data pada R memfasilitasi keberagaman jenis variabel data. Sebagai contoh, terdapat
+data yang terdiri dari sekumpulan angka dan data lain yang berisi sekumpulan karakter. Pada
+contoh lain, ada pula data yang berbentuk tabel maupun kumpulan (*list*) angka sederhana.
+Dengan bantuan fungsi `class`, kita akan mendapatkan kemudahan dalam mendefinisikan tipe
+data yang kita miliki:
+```{r}
+a <- 2
+class(a)
+```
+Agar dapat bekerja secara efisien dalam menggunakan bahasa pemrograman R, penting untuk
+mempelajari terlebih dahulu tipe data dari variabel-variabel yang kita miliki sehingga akan
+mempermudah dalam penentuan proses analisis data yang dapat dilakukan terhadap variabelvariabel tersebut. 
+
+## Data Frames
+Cara paling umum yang dapat digunakan untuk menyimpan *dataset* dalam R adalah dalam tipe
+*data frame*. Secara konseptual, kita dapat menganggap *data frame* sebagai tabel yang terdiri dari
+baris yang memiliki nilai pengamatan dan berbagai variabel yang didefinisikan dalam bentuk
+kolom. Tipe data ini sangat umum digunakan untuk *dataset*, karena *data frame* dapat
+menggabungkan berbagai jenis tipe data dalam satu objek. Untuk memahami tipe *data frame*,
+silahkan mengakses contoh *dataset* pada `library(dslabs) `dan pilih *dataset* “*murders*”
+menggunakan fungsi `data`:
+```{r}
+library(dslabs)
+data(murders) 
+```
+Untuk memastikan bahwa *dataset* tersebut tipenya adalah *data frame*, dapat digunakan perintah
+berikut:
+```{r}
+class(murders) 
+```
+Untuk memeriksa lebih lanjut isi *dataset*, dapat pula digunakan fungsi `str` untuk mencari tahu
+lebih rinci mengenai struktur suatu objek:
+
+```{r}
+str(murders) 
+```
+Dengan menggunakan fungsi `str`, dapat diketahui bahwa *dataset* “*murders*” terdiri dari 51 baris
+dan lima variabel: *state, abb, region, population, dan total.* Selanjutnya, untuk melihat contoh
+enam baris pertama pada dataset, dapat digunakan fungsi `head`:
+```{r}
+head(murders)
+```
+Untuk analisis awal tiap variabel yang diwakili dalam bentuk kolom pada tipe *data frame*, dapat
+digunakan operator aksesor ($) dengan cara berikut:
+```{r}
+murders$population 
+```
+Untuk mengetahui nama-nama dari lima variabel yang dapat dievaluasi menggunakan operator
+aksesor, sebelumnya, melalui fungsi `str`, telah kita ketahui bahwa variabel yang dimiliki *dataset*
+adalah: *state, abb, region, population, dan total.* Sebagai alternatif, terdapat pula fungsi `name`,
+yang dapat digunakan seperti contoh dibawah ini: 
+```{r}
+names(murders) 
+```
+
+## Vector : numeric, character, dan logical 
+Objek `murders$population` terdiri dari sekumpulan *numeric* atau data-data angka. Sehingga,
+kita dapat mendefinisikan bahwa tipe data `murders$population` berupa *vector.* Angka tunggal
+secara teknis dapat didefinisikan sebagai vektor dengan panjang 1, tetapi secara umum kita akan menggunakan *vector* sebagai istilah untuk merujuk ke objek yang terdiri dari beberapa entri.Untuk mengidentifikasi banyaknya entri dalam suatu vector dapat digunakan fungsi `length`seperti contoh berikut: 
+```{r}
+length(murders$population) 
+```
+*Vector* khusus ini bertipe *numeric* karena populasi terdiri dari data-data angka: 
+```{r}
+class(murders$population) 
+```
+Secara matematis, nilai-nilai dalam `murders$population` adalah berupa *integer.* Namun,
+secara default, data angka akan diberikan tipe *numeric* meskipun sebenarnya data tersebut
+merupakan bilangan bulat. Misalnya, `class(1) `akan mengidentifikasi nilai 1 sebagai tipe
+*numeric.* Untuk mengubah tipe *numeric* menjadi *integer*, dapat digunakan fungsi `as.integer()`
+atau dengan menambahkan L pada akhir data angka, contoh: 1L. Untuk melihat perbedaannya,
+silahkan gunakan `class(1L)`. 
+
+*Vector* juga dapat digunakan untuk menyimpan *string* dengan tipe *character*, Sebagai contoh:
+nama negara pada dataset “*murders*”: 
+```{r}
+class(murders$state) 
+```
+Jenis *vector* penting lainnya adalah *logical* yang nilainya berupa TRUE atau FALSE.
+```{r}
+z <- 3 == 2
+z
+```
+```{r}
+class(z) 
+```
+## Factors
+Dalam *dataset* “*murders*”, variabel *state* yang berisi data karakter bukan bertipe *vector*: *character*,
+namun, tipe datanya adalah *factor*: 
+```{r}
+class(murders$region) 
+```
+Faktor berguna untuk menyimpan data kategorikal. Dapat dilihat, bahwa hanya terdapat 4 wilayah
+pada variabel *state.* Untuk melihat jumlah kategori yang dimiliki oleh variabel dengan tipe data
+*factor* dapat digunakan fungsi `level`:
+```{r}
+levels(murders$region) 
+```
+Pada *background process*, R menyimpan level sebagai bilangan bulat yang memiliki peta
+tersendiri untuk melacak arti label dari bilangan tersebut. Hal ini dimaksudkan untuk
+penghematan memori, terutama apabila karakter dari tiap level cukup panjang. Standarnya, level
+akan ditampilkan sesuai urutan abjad. 
+
+## Lists
+*Data frame* merupakan sekumpulan *list* yang memiliki kelas yang berbeda-beda. Sama halnya
+dengan *data frame*, analisis *list* dapat dilakukan dengan menggunakan operator aksesor ($) dan
+dua kurung siku ([[). 
+
+## Matriks
+Matriks merupakan tipe data yang mirip dengan *data frame* karena keduanya memiliki dua
+dimensi, yaitu: baris dan kolom. Namun, sama halnya dengan tipe data *vector* numerik, karakter
+dan logis, entri dalam matriks harus terdiri dari jenis *vector* yang sama. Dalam hal ini, *data frame*
+dapat dikatakan sebagai tipe data yang paling cocok untuk menyimpan data, karena kita dapat
+memiliki karakter, faktor, dan angka sekaligus dalam satu *data frame.* Namun matriks memiliki
+satu keunggulan yang tidak dimiliki oleh tipe *data frame*: pada matriks dapat dilakukan operasi
+aljabar
+Untuk mendefinisikan matriks, dapat digunakan fungsi `matrix` dengan mendefinisikan pula
+argumen berupa jumlah baris dan kolom yang diinginkan.
+```{r}
+mat <- matrix(1:12, 4, 3)
+mat 
+```
+Untuk mengakses entri tertentu dalam matriks, dapat digunakan tanda kurung siku ([). Sebagai
+contoh, kita akan menampilkan data pada baris kedua, kolom ketiga, menggunakan: 
+```{r}
+mat[2, 3]
