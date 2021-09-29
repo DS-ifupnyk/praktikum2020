@@ -1,0 +1,61 @@
+---
+title: "Latihan3_123190138"
+author: "rega agassi"
+date: "9/27/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dslabs)
+data(murders) 
+```
+## No 1
+```{r}
+str(murders) 
+```
+
+Pernyataan yang paling menggambarkan karakter dari tiap variabel pada data frame adalah pernyataan c, karena data berisi nama negara bagian, singkatan negara bagian, wilayah negara bagian, populasi dan jumlah pembunuhan pada negara bagian tersebut pada tahun 2010
+
+## No 2
+```{r}
+names(murders)
+```
+
+Nama kolom yang digunakan pada data frame ada state, abb/abbreviation, region, population dan total
+
+## No 3
+```{r}
+a = murders$abb
+class(a)
+```
+
+Penggunaan operator aksesor($) untuk mengekstrak informasi singkatan negara dan menyimpannya pada objek "a". Jenis class dari a adalah character
+
+## No 4
+```{r}
+b = murders[[2]]
+b == a
+```
+
+Tnada kurung siku dengan indeks 2 digunakan untuk mengekstrak abb state ke objek b, a==b mengecek apakah a dan b memiliki nilai yang sama dan setelah dijalankan a dan b memiliki nilai yang sama
+
+## No 5
+```{r}
+length(levels(murders$region))
+```
+
+Terdapat 4 region yang dimiliki oleh dataset
+
+## No 6
+```{r}
+table(murders$region)
+```
+
+Fungsi table ini untuk menunjukan jumlah state dalam suatu region
