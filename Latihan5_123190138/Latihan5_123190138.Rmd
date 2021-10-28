@@ -1,0 +1,69 @@
+---
+title: "Latihan5_123190138"
+author: "rega agassi"
+date: "10/28/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dslabs)
+data(murders) 
+```
+# Modul 5
+
+
+1. Fungsi nchar dapat digunakan untuk menghitung jumlah karakter dari suatu vektor karakter. Buatlah satu baris kode yang akan menyimpan hasil komputasi pada variabel ‘new_names’ dan berisi singkatan nama negara ketika jumlah karakternya lebih dari 8 karakter. 
+.
+
+```{r}
+new_names <- ifelse(nchar(murders$state) > 8, murders$abb, murders$state) 
+new_names
+```
+
+
+2. Buat fungsi sum_n yang dapat digunakan untuk menghitung jumlah bilangan bulat dari 1 hingga n. Gunakan pula fungsi ini untuk menentukan jumlah bilangan bulat dari 1 hingga 5.000. 
+.
+```{r}
+sum_n <- function(n){
+ x<- 1:n
+ sum(x)
+}
+n<-5000
+sum_n(n)
+```
+
+
+
+3. Buat fungsi compute_s_n yang dapat digunakan untuk menghitung jumlah Sn = 1^2+ 2^2+ 3^2+. . . n^2. Tampilkan hasil penjumlahan ketika n = 10. 
+  
+````{r}
+compute_s_n <- function(n){ 
+x <- 1:n 
+sum(x*x) 
+} 
+n<-10
+compute_s_n(n) 
+```
+4. Buat vektor numerik kosong dengan nama: s_n dengan ukuran:25 menggunakan s_n <- vector ("numeric", 25).
+Simpan di hasil komputasi S1, S2,. . . S25 menggunakan FOR-LOOP. 
+.
+```{r}
+len <- 25 
+s_n <- vector("numeric", length = len)
+for(n in 1:len){ 
+s_n[n] <- compute_s_n(n) 
+} 
+s_n
+```
+5. Ulangi langkah pada soal no. 4 dan gunakan fugsi sapply. 
+```{r}
+n <- 1:25 
+s_n <- sapply(n, compute_s_n) 
+s_n
+```
